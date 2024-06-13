@@ -110,6 +110,5 @@
  </layer>
  <objectgroup id="2" name="Object Layer 1">
   <object id="1" name="player" x="217.333" y="104.667" width="16" height="16"/>
-  <object id="2" name="enemy" x="324.727" y="111.273"/>
  </objectgroup>
 </map>

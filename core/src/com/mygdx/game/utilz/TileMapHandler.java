@@ -16,6 +16,7 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import com.mygdx.game.GameScreen;
 import com.mygdx.game.entity.Enemy;
 import com.mygdx.game.entity.Player;
+import com.mygdx.game.entity.SwordMan;
 
 import static com.mygdx.game.utilz.Constant.PPM;
 
@@ -51,9 +52,18 @@ public class TileMapHandler {
                             false,
                             gameScreen.getWorld()
                     );
-                    gameScreen.setPlayer(new Player(rectangle.width, rectangle.height, body));
-                }
-                else if (rectangleName.equals("enemy")){
+                    gameScreen.setPlayer(
+                            new SwordMan("Character/SwordHero.png", Constant.PLAYER.SWORD_HERO.WIDTH,
+                                    Constant.PLAYER.SWORD_HERO.HEIGHT, Constant.PLAYER.SWORD_HERO.DEFAULT_WIDTH,
+                                    Constant.PLAYER.SWORD_HERO.DEFAULT_HEIGHT, body, 27, Constant.PLAYER.SWORD_HERO.IDLE,
+                                    Constant.PLAYER.SWORD_HERO.getType(Constant.PLAYER.SWORD_HERO.IDLE),
+                                    Constant.PLAYER.SWORD_HERO.RUN, Constant.PLAYER.SWORD_HERO.getType(Constant.PLAYER.SWORD_HERO.RUN),
+                                    Constant.PLAYER.SWORD_HERO.SPIN_ATTACK, Constant.PLAYER.SWORD_HERO.getType(Constant.PLAYER.SWORD_HERO.SPIN_ATTACK),
+                                    Constant.PLAYER.SWORD_HERO.DASH, Constant.PLAYER.SWORD_HERO.getType(Constant.PLAYER.SWORD_HERO.DASH),
+                                    Constant.PLAYER.SWORD_HERO.JUMP, Constant.PLAYER.SWORD_HERO.getType(Constant.PLAYER.SWORD_HERO.JUMP),
+                                    Constant.PLAYER.SWORD_HERO.HIT, Constant.PLAYER.SWORD_HERO.getType(Constant.PLAYER.SWORD_HERO.HIT))
+                    );
+                } else if (rectangleName.equals("enemy")) {
                     Body body = BodyHandler.createBody(
                             rectangle.getX() + rectangle.getWidth() / 2,
                             rectangle.getY() + rectangle.getHeight() / 2,

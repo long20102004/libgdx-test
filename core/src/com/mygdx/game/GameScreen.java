@@ -29,6 +29,7 @@ public class GameScreen extends ScreenAdapter {
     private Texture background;
     private Player player;
     private Enemy enemy;
+
     public GameScreen(OrthographicCamera camera) {
         System.out.println("Screen is created");
         this.camera = camera;
@@ -36,14 +37,15 @@ public class GameScreen extends ScreenAdapter {
         backgroundCamera.setToOrtho(false, SCREEN_WIDTH, SCREEN_HEIGHT);
         backgroundCamera.update();
         this.batch = new SpriteBatch();
-        this.world = new World(new Vector2(0,-25f), false);
+        this.world = new World(new Vector2(0, -25f), false);
         this.tileMapHandler = new TileMapHandler(this);
         this.orthogonalTiledMapRenderer = tileMapHandler.setupMap();
         this.box2DDebugRenderer = new Box2DDebugRenderer();
         background = new Texture("background3.png");
     }
-    private void update(){
-        world.step(1/60f, 6, 2);
+
+    private void update() {
+        world.step(1 / 60f, 6, 2);
         cameraUpdate();
         batch.setProjectionMatrix(camera.combined);
         orthogonalTiledMapRenderer.setView(camera);
@@ -61,16 +63,28 @@ public class GameScreen extends ScreenAdapter {
     }
 
     @Override
-    public void render(float delta){
+    public void render(float delta) {
         this.update();
-        Gdx.gl.glClearColor(0,0,0,1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        // Draw the background first
         batch.setProjectionMatrix(backgroundCamera.combined);
         batch.begin();
         batch.draw(background, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         batch.end();
+
+        // Then render the map
+        orthogonalTiledMapRenderer.setView(camera);
         orthogonalTiledMapRenderer.render();
-        box2DDebugRenderer.render(world,camera.combined.scl(PPM));
+
+        // Finally, draw the player
+        batch.setProjectionMatrix(camera.combined);
+        batch.begin();
+        player.draw(batch);
+        batch.end();
+
+        box2DDebugRenderer.render(world, camera.combined.scl(PPM));
     }
 
     public World getWorld() {
