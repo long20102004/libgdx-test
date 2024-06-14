@@ -109,6 +109,6 @@
 </data>
  </layer>
  <objectgroup id="2" name="Object Layer 1">
-  <object id="1" name="player" x="217.333" y="104.667" width="16" height="16"/>
+  <object id="1" name="entity" x="217.333" y="104.667" width="16" height="16"/>
  </objectgroup>
 </map>

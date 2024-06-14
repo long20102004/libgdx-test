@@ -21,6 +21,7 @@ public class MyGdxGame extends Game {
 
     @Override
     public void create() {
+//        Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
         System.out.println("Game is created");
         camera = new OrthographicCamera();
         SCREEN_WIDTH = Gdx.graphics.getWidth();

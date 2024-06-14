@@ -12,9 +12,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
-import com.mygdx.game.entity.Enemy;
-import com.mygdx.game.entity.Player;
+import com.mygdx.game.entity.Entity;
 import com.mygdx.game.utilz.TileMapHandler;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.mygdx.game.utilz.Constant.*;
 
@@ -27,8 +29,8 @@ public class GameScreen extends ScreenAdapter {
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
     private TileMapHandler tileMapHandler;
     private Texture background;
-    private Player player;
-    private Enemy enemy;
+    private Entity player;
+    List<Entity> enemies = new ArrayList<>();
 
     public GameScreen(OrthographicCamera camera) {
         System.out.println("Screen is created");
@@ -50,8 +52,8 @@ public class GameScreen extends ScreenAdapter {
         batch.setProjectionMatrix(camera.combined);
         orthogonalTiledMapRenderer.setView(camera);
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) Gdx.app.exit();
-        player.update();
-        enemy.update(player);
+        player.update(this);
+        for (Entity enemy : enemies) enemy.update(this);
     }
 
     private void cameraUpdate() {
@@ -78,10 +80,11 @@ public class GameScreen extends ScreenAdapter {
         orthogonalTiledMapRenderer.setView(camera);
         orthogonalTiledMapRenderer.render();
 
-        // Finally, draw the player
+        // Finally, draw the entity
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         player.draw(batch);
+        for (Entity enemy : enemies) enemy.draw(batch);
         batch.end();
 
         box2DDebugRenderer.render(world, camera.combined.scl(PPM));
@@ -91,15 +94,14 @@ public class GameScreen extends ScreenAdapter {
         return world;
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
+    public void setPlayer(Entity entity) {
+        this.player = entity;
+    }
+    public void addEnemy(Entity enemy){
+        enemies.add(enemy);
     }
 
-    public void setEnemy(Enemy enemy) {
-        this.enemy = enemy;
-    }
-
-    public Player getPlayer() {
+    public Entity getPlayer() {
         return player;
     }
 }

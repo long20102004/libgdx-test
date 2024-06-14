@@ -7,6 +7,7 @@ public class Constant {
     public static final float PPM = 32f;
     public static final int GAME_WIDTH = 120 * 40;
     public static final int GAME_HEIGHT = 100 * 40;
+    public static final float TILE_SIZE = 16 / PPM;
     public static final int SCREEN_WIDTH = Gdx.graphics.getWidth();
     public static final int SCREEN_HEIGHT = Gdx.graphics.getHeight();
 
@@ -418,8 +419,8 @@ public class Constant {
     public static class GHOUL {
         public static final int DEFAULT_WIDTH = 62;
         public static final int DEFAULT_HEIGHT = 33;
-        public static final int WIDTH = (int) (DEFAULT_WIDTH * MODE * 1.3);
-        public static final int HEIGHT = (int) (DEFAULT_HEIGHT * MODE * 1.3);
+        public static final int WIDTH = (int) (DEFAULT_WIDTH * MODE);
+        public static final int HEIGHT = (int) (DEFAULT_HEIGHT * MODE);
         public static final int WAKE = 0;
         public static final int MOVING = 1;
         public static final int ATTACK = 2;
@@ -430,7 +431,7 @@ public class Constant {
         public static int getType(int type) {
             switch (type) {
                 case WAKE:
-                    return 3;
+                    return 4;
                 case MOVING:
                     return 8;
                 case ATTACK:

@@ -14,8 +14,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.mygdx.game.GameScreen;
-import com.mygdx.game.entity.Enemy;
-import com.mygdx.game.entity.Player;
+import com.mygdx.game.entity.Ghoul;
 import com.mygdx.game.entity.SwordMan;
 
 import static com.mygdx.game.utilz.Constant.PPM;
@@ -43,36 +42,37 @@ public class TileMapHandler {
                 Rectangle rectangle = ((RectangleMapObject) mapObject).getRectangle();
                 String rectangleName = mapObject.getName();
                 if (rectangleName == null) continue;
+
+                Body body = BodyHandler.createBody(
+                        rectangle.getX() + rectangle.getWidth() / 2,
+                        rectangle.getY() + rectangle.getHeight() / 2,
+                        rectangle.getWidth(),
+                        rectangle.getHeight(),
+                        false,
+                        gameScreen.getWorld()
+                );
                 if (rectangleName.equals("player")) {
-                    Body body = BodyHandler.createBody(
-                            rectangle.getX() + rectangle.getWidth() / 2,
-                            rectangle.getY() + rectangle.getHeight() / 2,
-                            rectangle.getWidth(),
-                            rectangle.getHeight(),
-                            false,
-                            gameScreen.getWorld()
-                    );
                     gameScreen.setPlayer(
                             new SwordMan("Character/SwordHero.png", Constant.PLAYER.SWORD_HERO.WIDTH,
                                     Constant.PLAYER.SWORD_HERO.HEIGHT, Constant.PLAYER.SWORD_HERO.DEFAULT_WIDTH,
                                     Constant.PLAYER.SWORD_HERO.DEFAULT_HEIGHT, body, 27, Constant.PLAYER.SWORD_HERO.IDLE,
                                     Constant.PLAYER.SWORD_HERO.getType(Constant.PLAYER.SWORD_HERO.IDLE),
-                                    Constant.PLAYER.SWORD_HERO.RUN, Constant.PLAYER.SWORD_HERO.getType(Constant.PLAYER.SWORD_HERO.RUN),
+                                    Constant.PLAYER.SWORD_HERO.RUN_FAST, Constant.PLAYER.SWORD_HERO.getType(Constant.PLAYER.SWORD_HERO.RUN_FAST),
                                     Constant.PLAYER.SWORD_HERO.SPIN_ATTACK, Constant.PLAYER.SWORD_HERO.getType(Constant.PLAYER.SWORD_HERO.SPIN_ATTACK),
                                     Constant.PLAYER.SWORD_HERO.DASH, Constant.PLAYER.SWORD_HERO.getType(Constant.PLAYER.SWORD_HERO.DASH),
                                     Constant.PLAYER.SWORD_HERO.JUMP, Constant.PLAYER.SWORD_HERO.getType(Constant.PLAYER.SWORD_HERO.JUMP),
                                     Constant.PLAYER.SWORD_HERO.HIT, Constant.PLAYER.SWORD_HERO.getType(Constant.PLAYER.SWORD_HERO.HIT))
                     );
-                } else if (rectangleName.equals("enemy")) {
-                    Body body = BodyHandler.createBody(
-                            rectangle.getX() + rectangle.getWidth() / 2,
-                            rectangle.getY() + rectangle.getHeight() / 2,
-                            rectangle.getWidth(),
-                            rectangle.getHeight(),
-                            false,
-                            gameScreen.getWorld()
+                } if (rectangleName.equals("ghoul")) {
+                    gameScreen.addEnemy(
+                            new Ghoul("Enemies/Ghoul.png", Constant.GHOUL.WIDTH, Constant.GHOUL.HEIGHT,
+                                    Constant.GHOUL.DEFAULT_WIDTH, Constant.GHOUL.DEFAULT_HEIGHT, body, 7,
+                                    Constant.GHOUL.WAKE, Constant.GHOUL.getType(Constant.GHOUL.WAKE),
+                                    Constant.GHOUL.MOVING, Constant.GHOUL.getType(Constant.GHOUL.MOVING),
+                                    Constant.GHOUL.ATTACK, Constant.GHOUL.getType(Constant.GHOUL.ATTACK),
+                                    6, 6, 6, 6,
+                                    Constant.GHOUL.HIT, Constant.GHOUL.getType(Constant.GHOUL.HIT))
                     );
-                    gameScreen.setEnemy(new Enemy(rectangle.width, rectangle.height, body));
                 }
             }
         }

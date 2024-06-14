@@ -13,9 +13,12 @@ public class BodyHandler {
         Body body = world.createBody(bodyDef);
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(width / 2 / PPM, height / 2 / PPM);
+
+
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.friction = 0;
+//        fixtureDef.density = 10000f;
         body.createFixture(fixtureDef);
         shape.dispose();
         return body;
