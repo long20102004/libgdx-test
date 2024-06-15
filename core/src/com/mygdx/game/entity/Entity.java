@@ -1,14 +1,18 @@
 package com.mygdx.game.entity;
 
+import box2dLight.RayHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.game.GameScreen;
+import com.mygdx.game.utilz.LightHandler;
 
 import java.lang.reflect.Type;
 
@@ -82,7 +86,7 @@ public class Entity extends Sprite {
         y = body.getPosition().y * PPM;
         this.setPosition(x - this.getWidth() / 2, y - this.getHeight() / 2);
         if (type == HERO){
-            if (facingRight) this.setX(x - this.width / 3);
+            if (facingRight) this.setX(x - this.width / 2f);
             else this.setX(x - this.width / 1.5f);
         }
         if (currentAction != 6) {

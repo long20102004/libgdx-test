@@ -3,7 +3,7 @@ package com.mygdx.game.utilz;
 import com.badlogic.gdx.Gdx;
 
 public class Constant {
-    public static final float MODE = 2f;
+    public static final float MODE = 2.3f;
     public static final float PPM = 32f;
     public static final int GAME_WIDTH = 120 * 40;
     public static final int GAME_HEIGHT = 100 * 40;
@@ -419,7 +419,7 @@ public class Constant {
     public static class GHOUL {
         public static final int DEFAULT_WIDTH = 62;
         public static final int DEFAULT_HEIGHT = 33;
-        public static final int WIDTH = (int) (DEFAULT_WIDTH * MODE);
+        public static final int WIDTH = (int) (DEFAULT_WIDTH * 2f);
         public static final int HEIGHT = (int) (DEFAULT_HEIGHT * MODE);
         public static final int WAKE = 0;
         public static final int MOVING = 1;
@@ -570,7 +570,7 @@ public class Constant {
         public static final int TREE1_DEFAULT_HEIGHT = 128;
         public static final int TREE1_DEFAULT_WIDTH = 112;
         public static final int TREE1_HEIGHT = (int) (TREE1_DEFAULT_HEIGHT * MODE);
-        public static final int TREE1_WIDTH = (int) (TREE1_DEFAULT_WIDTH * MODE);
+        public static final int TREE1_WIDTH = (int) (TREE1_DEFAULT_WIDTH * 1.2f);
         public static final int TREE2_DEFAULT_HEIGHT = 96;
         public static final int TREE2_DEFAULT_WIDTH = 128;
         public static final int TREE2_HEIGHT = (int) (TREE2_DEFAULT_HEIGHT * MODE);

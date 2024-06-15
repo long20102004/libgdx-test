@@ -1,20 +1,27 @@
 package com.mygdx.game;
 
+import box2dLight.Light;
+import box2dLight.PointLight;
+import box2dLight.RayHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.game.entity.Entity;
+import com.mygdx.game.object.AnimatedObject;
 import com.mygdx.game.utilz.TileMapHandler;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,9 +35,15 @@ public class GameScreen extends ScreenAdapter {
     private Box2DDebugRenderer box2DDebugRenderer;
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
     private TileMapHandler tileMapHandler;
-    private Texture background;
+    private Sprite background;
     private Entity player;
     List<Entity> enemies = new ArrayList<>();
+    List<AnimatedObject> objects = new ArrayList<>();
+    private List<RayHandler> rayHandlers = new ArrayList<>();
+    float time = 0;
+    private List<PointLight> pointLights = new ArrayList<>();
+    private Vector2 previousPlayerPosition = new Vector2();
+
 
     public GameScreen(OrthographicCamera camera) {
         System.out.println("Screen is created");
@@ -43,17 +56,47 @@ public class GameScreen extends ScreenAdapter {
         this.tileMapHandler = new TileMapHandler(this);
         this.orthogonalTiledMapRenderer = tileMapHandler.setupMap();
         this.box2DDebugRenderer = new Box2DDebugRenderer();
-        background = new Texture("background3.png");
+        background = new Sprite(new Texture("background/background5.png"));
+
     }
 
     private void update() {
+        // Calculate the difference in the player's position
+        Vector2 playerPosition = player.getBody().getPosition();
+        Vector2 deltaPosition = playerPosition.cpy().sub(previousPlayerPosition);
+
+        // Move the background by a fraction of this difference
+        background.setPosition(background.getX() - deltaPosition.x * 0.1f, background.getY() - deltaPosition.y * 0.1f);
+
+        // Update the player's previous position
+        previousPlayerPosition.set(playerPosition);
+        player.setScale(0.5f);
+        for (Entity entity : enemies) entity.setScale(0.5f);
+        camera.zoom = (0.5f);
+        time += Gdx.graphics.getDeltaTime();
+
+        // Calculate the light intensity
+        float minIntensity = 0.7f;
+        float maxIntensity = 1.3f;
+        float intensity = (float)((Math.sin(time) + 1) / 2 * (maxIntensity - minIntensity) + minIntensity);
+
+        // Set the light intensity
+        for (PointLight pointLight : pointLights) {
+            pointLight.setDistance(intensity);
+        }
+
         world.step(1 / 60f, 6, 2);
+        for (RayHandler rayHandler : rayHandlers){
+            rayHandler.update();
+            rayHandler.setCombinedMatrix(camera.combined.cpy().scl(PPM));
+        }
         cameraUpdate();
         batch.setProjectionMatrix(camera.combined);
         orthogonalTiledMapRenderer.setView(camera);
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) Gdx.app.exit();
         player.update(this);
         for (Entity enemy : enemies) enemy.update(this);
+        for (AnimatedObject object : objects) object.update();
     }
 
     private void cameraUpdate() {
@@ -67,41 +110,74 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         this.update();
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClearColor(30f / 255, 30f / 255, 30f / 255, 1);
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        // Draw the background first
+        orthogonalTiledMapRenderer.setView(camera);
         batch.setProjectionMatrix(backgroundCamera.combined);
         batch.begin();
-        batch.draw(background, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+//        batch.draw(background, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         batch.end();
-
-        // Then render the map
-        orthogonalTiledMapRenderer.setView(camera);
         orthogonalTiledMapRenderer.render();
 
-        // Finally, draw the entity
+
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        player.draw(batch);
         for (Entity enemy : enemies) enemy.draw(batch);
-        batch.end();
+        for (AnimatedObject object : objects) {
+            object.draw(batch);
+        }
+//        box2DDebugRenderer.render(world, camera.combined.cpy().scl(PPM));
 
-        box2DDebugRenderer.render(world, camera.combined.scl(PPM));
+        player.draw(batch);
+        batch.end();
+        for (RayHandler rayHandler : rayHandlers){
+            rayHandler.render();
+        }
+    }
+
+    @Override
+    public void dispose() {
+        for (RayHandler rayHandler : rayHandlers) rayHandler.dispose();
     }
 
     public World getWorld() {
         return world;
     }
-
+    public void addRayHandler(Body body, boolean isStrong){
+        RayHandler rayHandler = new RayHandler(world);
+        rayHandler.setAmbientLight(1f);
+        if (!isStrong) {
+            PointLight pointLight = new PointLight(rayHandler, 200, Color.WHITE, 6, body.getPosition().x + 3, body.getPosition().y);
+            pointLight.setSoftnessLength(3f);
+            pointLight.attachToBody(body, 0, 0);
+            pointLight.setColor(new Color(1, 1, 1, 0.8f));
+        }
+        else{
+            PointLight pointLight = new PointLight(rayHandler, 200, Color.WHITE, 2, body.getPosition().x + 3, body.getPosition().y);
+            addPointLight(pointLight);
+            pointLight.setSoftnessLength(0f);
+            pointLight.attachToBody(body, 0, 0);
+            pointLight.setColor(new Color(1, 1, 1, 1f));
+        }
+        rayHandlers.add(rayHandler);
+    }
     public void setPlayer(Entity entity) {
         this.player = entity;
+        addRayHandler(entity.getBody(), false);
     }
-    public void addEnemy(Entity enemy){
+
+    public void addEnemy(Entity enemy) {
         enemies.add(enemy);
+    }
+
+    public void addObject(AnimatedObject object) {
+        objects.add(object);
     }
 
     public Entity getPlayer() {
         return player;
+    }
+    public void addPointLight(PointLight pointLight){
+        pointLights.add(pointLight);
     }
 }

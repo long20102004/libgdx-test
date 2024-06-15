@@ -18,6 +18,7 @@ public class BodyHandler {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.friction = 0;
+        if (isStatic) fixtureDef.filter.categoryBits = 0;
 //        fixtureDef.density = 10000f;
         body.createFixture(fixtureDef);
         shape.dispose();
