@@ -70,7 +70,8 @@ public class TileMapHandler {
                                     Constant.PLAYER.SWORD_HERO.SPIN_ATTACK, Constant.PLAYER.SWORD_HERO.getType(Constant.PLAYER.SWORD_HERO.SPIN_ATTACK),
                                     Constant.PLAYER.SWORD_HERO.DASH, Constant.PLAYER.SWORD_HERO.getType(Constant.PLAYER.SWORD_HERO.DASH),
                                     Constant.PLAYER.SWORD_HERO.JUMP, Constant.PLAYER.SWORD_HERO.getType(Constant.PLAYER.SWORD_HERO.JUMP),
-                                    Constant.PLAYER.SWORD_HERO.HIT, Constant.PLAYER.SWORD_HERO.getType(Constant.PLAYER.SWORD_HERO.HIT))
+                                    Constant.PLAYER.SWORD_HERO.HIT, Constant.PLAYER.SWORD_HERO.getType(Constant.PLAYER.SWORD_HERO.HIT),
+                                    Constant.PLAYER.SWORD_HERO.DEATH, Constant.PLAYER.SWORD_HERO.getType(Constant.PLAYER.SWORD_HERO.DEATH))
                     );
                 }
                 if (rectangleName.contains("ghoul")) {
@@ -82,7 +83,7 @@ public class TileMapHandler {
                                     Constant.GHOUL.MOVING, Constant.GHOUL.getType(Constant.GHOUL.MOVING),
                                     Constant.GHOUL.ATTACK, Constant.GHOUL.getType(Constant.GHOUL.ATTACK),
                                     6, 6, 6, 6,
-                                    Constant.GHOUL.HIT, Constant.GHOUL.getType(Constant.GHOUL.HIT))
+                                    Constant.GHOUL.HIT, Constant.GHOUL.getType(Constant.GHOUL.HIT), Constant.GHOUL.DEAD, Constant.GHOUL.getType(Constant.GHOUL.DEAD))
                     );
                     if (rectangleName.contains("-light")){
                         gameScreen.addRayHandler(body, true);

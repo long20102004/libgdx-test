@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
@@ -34,7 +36,15 @@ public class Entity extends Sprite {
     protected float attackRange = 3 * TILE_SIZE;
     protected boolean facingRight = true;
     protected int currentAction, idle, moving, attacking, dashing, jumping, falling, wallSlide, hit, dead;
-
+    protected boolean isActive;
+    protected int maxHealth = 100;
+    protected int currentHealth = maxHealth;
+    protected int maxPower = 100;
+    protected int currentPower = maxPower;
+    protected boolean isAttacked = false;
+    protected Rectangle hitBox, attackBox;
+    protected int damage;
+    ShapeRenderer renderer = new ShapeRenderer();
     public Entity(int type, String playerPicture, float width, float height,
                   float defaultWidth, float defaultHeight, Body body, int numberAction,
                   int idleAction, int numberIdleFrame,
@@ -42,16 +52,21 @@ public class Entity extends Sprite {
                   int attackingAction, int numberAttackingFrame,
                   int dashingAction, int numberDashingFrame,
                   int jumpingAction, int numberJumpingFrame,
-                  int hit, int numberHitFrame) {
+                  int hit, int numberHitFrame,
+                  int die, int numberDieFrame) {
         super(new Texture(Gdx.files.internal(playerPicture)));
+        renderer.setAutoShapeType(true);
         this.type = type;
         this.width = width;
         this.height = height;
         this.setSize(width, height);
+        hitBox = new Rectangle(body.getPosition().x, body.getPosition().y, width, height);
+        attackBox = new Rectangle(body.getPosition().x, body.getPosition().y, width * 1.5f, height);
         this.body = body;
         if (type == ENEMY) this.speed = 1f;
         else this.speed = 4f;
         INSTANCE = this;
+        isActive = true;
 
         animationLength = new int[numberAction];
         setIdle(idleAction, numberIdleFrame);
@@ -60,7 +75,7 @@ public class Entity extends Sprite {
         setDashing(dashingAction, numberDashingFrame);
         setJumping(jumpingAction, numberJumpingFrame);
         setHit(hit, numberHitFrame);
-//        System.out.println(idleAction.);
+        setDead(die, numberDieFrame);
         currentAction = idle;
 
         Texture spriteSheet = new Texture(playerPicture);
@@ -72,21 +87,30 @@ public class Entity extends Sprite {
             animations[i] = new Animation<>(0.15f, animationFrames);
         }
     }
-
+    public void drawHitbox(){
+        renderer.begin();
+        renderer.rect(hitBox.getX(), hitBox.getY(), hitBox.getWidth(), hitBox.getHeight());
+        renderer.end();
+    }
     public void update(GameScreen gameScreen) {
+        if (!isActive) return;
         this.setOriginCenter();
-        if (type == HERO) checkUserInput();
+        if (type == HERO) checkUserInput(gameScreen);
         else enemyAction(gameScreen);
         if (animations[currentAction].isAnimationFinished(stateTime)) {
             stateTime = 0;
             currentAction = idle;
+            isAttacked = false;
         }
         stateTime += Gdx.graphics.getDeltaTime();
         x = body.getPosition().x * PPM;
         y = body.getPosition().y * PPM;
         this.setPosition(x - this.getWidth() / 2, y - this.getHeight() / 2);
+        hitBox.setPosition(x - this.getWidth() / 2, y - this.getHeight() / 2);
+        attackBox.setPosition(x - this.getWidth() / 2, y - this.getHeight() / 2);
+
         if (type == HERO){
-            if (facingRight) this.setX(x - this.width / 2f);
+            if (facingRight) this.setX(x - this.width / 2.5f);
             else this.setX(x - this.width / 1.5f);
         }
         if (currentAction != 6) {
@@ -94,9 +118,6 @@ public class Entity extends Sprite {
             this.setRegion(currentFrame);
         }
 
-        // Set the origin to the center of the image
-
-        // Check if the velocity in the x direction is less than 0
         if (!facingRight && !this.isFlipX()) {
             // If it is, flip the sprite horizontally
             this.flip(true, false);
@@ -119,7 +140,7 @@ public class Entity extends Sprite {
         } else currentAction = attacking;
     }
 
-    private void checkUserInput() {
+    private void checkUserInput(GameScreen gameScreen) {
         if (currentAction == moving) currentAction = idle;
         velX = 0;
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
@@ -141,12 +162,33 @@ public class Entity extends Sprite {
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
             currentAction = attacking;
+            if (!isAttacked) playerAttack(gameScreen);
         }
         if (Math.abs(body.getLinearVelocity().y) < 0.01) {
             jumpCount = 0;
 //            currentAction = idle;
         }
         body.setLinearVelocity(velX * speed, Math.min(body.getLinearVelocity().y, 25));
+    }
+
+    private void playerAttack(GameScreen gameScreen) {
+        isAttacked = true;
+        for (Entity entity : gameScreen.getEnemies()){
+            if (attackBox.overlaps(entity.hitBox)){
+                entity.updateHealth(-damage);
+                entity.currentAction = hit;
+                System.out.println("hit");
+            }
+        }
+    }
+    private void updateHealth(int damage){
+        currentHealth += damage;
+        System.out.println(currentHealth);
+        if (currentHealth <= 0){
+            currentHealth = 0;
+            currentAction = dead;
+            System.out.println("dead");
+        }
     }
 
     public void setMovingAction(int movingAction, int numberFrame) {
@@ -179,8 +221,15 @@ public class Entity extends Sprite {
         animationLength[idle] = numberFrame;
 //        System.out.println(idle + " " + animationLength[idle]);
     }
+    public void setDead(int dead, int numberFrame){
+        this.dead = dead;
+        animationLength[dead] = numberFrame;
+    }
 
     public Body getBody() {
         return body;
+    }
+    public void setDamage(int damage){
+        this.damage = damage;
     }
 }

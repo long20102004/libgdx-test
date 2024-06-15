@@ -129,6 +129,7 @@ public class GameScreen extends ScreenAdapter {
 //        box2DDebugRenderer.render(world, camera.combined.cpy().scl(PPM));
 
         player.draw(batch);
+        player.drawHitbox();
         batch.end();
         for (RayHandler rayHandler : rayHandlers){
             rayHandler.render();
@@ -176,6 +177,9 @@ public class GameScreen extends ScreenAdapter {
 
     public Entity getPlayer() {
         return player;
+    }
+    public List<Entity> getEnemies(){
+        return enemies;
     }
     public void addPointLight(PointLight pointLight){
         pointLights.add(pointLight);

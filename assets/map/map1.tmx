@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="100" height="60" tilewidth="16" tileheight="16" infinite="0" nextlayerid="15" nextobjectid="8">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="100" height="60" tilewidth="16" tileheight="16" infinite="0" nextlayerid="15" nextobjectid="25">
  <editorsettings>
   <export target="../../../../../Documents/GDev/Dark Tileset Test..json" format="json"/>
  </editorsettings>
@@ -88,10 +88,7 @@
 </data>
  </layer>
  <objectgroup id="14" name="Object Layer 1">
-  <object id="2" name="player" x="491.677" y="401.922" width="15" height="35"/>
-  <object id="4" x="393.679" y="444.239">
-   <polyline points="0,0 118.786,4.45446 118.043,144.028 -36.3781,147.74"/>
-  </object>
+  <object id="2" name="player" x="491.677" y="401.922" width="15" height="30"/>
   <object id="5" x="313.499" y="682.553">
    <polyline points="0,0 417.977,4.45446"/>
   </object>
@@ -100,6 +97,23 @@
   </object>
   <object id="7" x="390.5" y="441">
    <polyline points="0,0 -8.5,-8 -8,-16 -3.5,-50 23,-61.5 34,-56.5 66.5,-60 76.5,-57 113,-60 128,-57.5 195.5,-58.5 208,-85.5 228.5,-95.5 237,-87.5 236,-79.5 235.5,-69 245.5,-68.5 250,-61 251.5,-49 250.5,-6.5 242.5,3.5 202.5,7.5 205,33.5 306.5,40 335,41 341,47.5 345.5,52.5 348.5,64.5 341,100 332.5,107 201.5,101.5 203.5,145.5 204.5,151.5 219,148 219.5,161 217.5,164 222.5,181 240,181 333.5,183.5 342.5,189 346,205 344.5,243"/>
+  </object>
+  <object id="8" x="530" y="593.333">
+   <polygon points="0,0 44.6667,-0.333333 46,1.33333 45.6667,30.3333 -1.33333,30.6667 -2,27.3333"/>
+  </object>
+  <object id="9" name="light" x="519.667" y="392.667"/>
+  <object id="10" name="light" x="630" y="378"/>
+  <object id="11" name="light" x="635.333" y="484.333" width="0.333333" height="0.333333"/>
+  <object id="12" name="light" x="678.333" y="485"/>
+  <object id="13" name="light" x="708.333" y="487.333"/>
+  <object id="14" x="587" y="535.5"/>
+  <object id="18" x="349" y="657.5" width="1.25" height="0.5"/>
+  <object id="22" name="ghoul" x="421.5" y="406" width="13" height="27.25"/>
+  <object id="23" x="392" y="444">
+   <polyline points="0,0 4,3 216.75,3"/>
+  </object>
+  <object id="24" x="512.75" y="448.75">
+   <polyline points="0,0 -1.5,70.5 -1.25,112"/>
   </object>
  </objectgroup>
  <layer id="12" name="Cave in Wall" width="100" height="60">
