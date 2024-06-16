@@ -44,6 +44,7 @@ public class Entity extends Sprite {
     protected boolean isAttacked = false;
     protected Rectangle hitBox, attackBox;
     protected int damage;
+    protected int mana = 10;
     ShapeRenderer renderer = new ShapeRenderer();
     public Entity(int type, String playerPicture, float width, float height,
                   float defaultWidth, float defaultHeight, Body body, int numberAction,
@@ -164,6 +165,12 @@ public class Entity extends Sprite {
             currentAction = attacking;
             if (!isAttacked) playerAttack(gameScreen);
         }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.K)){
+            if(mana <= currentPower){
+                updatePower(mana);
+                currentAction = dashing;
+            }
+        }
         if (Math.abs(body.getLinearVelocity().y) < 0.01) {
             jumpCount = 0;
 //            currentAction = idle;
@@ -189,6 +196,11 @@ public class Entity extends Sprite {
             currentAction = dead;
             System.out.println("dead");
         }
+    }
+
+    private void updatePower(int mana){
+        currentPower -= mana;
+
     }
 
     public void setMovingAction(int movingAction, int numberFrame) {
@@ -231,5 +243,11 @@ public class Entity extends Sprite {
     }
     public void setDamage(int damage){
         this.damage = damage;
+    }
+    public int getCurrentPower(){
+        return currentPower;
+    }
+    public int getCurrentHealth(){
+        return currentHealth;
     }
 }

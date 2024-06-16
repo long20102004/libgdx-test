@@ -10,7 +10,9 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -19,6 +21,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.game.entity.Entity;
 import com.mygdx.game.object.AnimatedObject;
+import com.mygdx.game.utilz.HealthHandler;
 import com.mygdx.game.utilz.TileMapHandler;
 
 import java.awt.*;
@@ -114,13 +117,25 @@ public class GameScreen extends ScreenAdapter {
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
         orthogonalTiledMapRenderer.setView(camera);
         batch.setProjectionMatrix(backgroundCamera.combined);
-        batch.begin();
+
 //        batch.draw(background, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-        batch.end();
+
         orthogonalTiledMapRenderer.render();
 
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(1, 0, 0, 1); // Màu đỏ
+        pixmap.fill();
+        Texture redTexture = new Texture(pixmap);
+        pixmap.dispose();
 
+        batch.begin();
+        batch.draw(redTexture, 27,436,player.getCurrentHealth(),11);
+        batch.draw(new Texture("UI/HealthBar.png"), 20, 430, 120, 20);
+
+        TextureRegion tmp = new TextureRegion(new Texture("UI/PowerBar.png"), Math.max(35*(player.getCurrentPower()/10 - 1),0), 0, 105/3, 16);
+        batch.draw(tmp, 25, 420, 80, 20);
         batch.setProjectionMatrix(camera.combined);
+        batch.end();
         batch.begin();
         for (Entity enemy : enemies) enemy.draw(batch);
         for (AnimatedObject object : objects) {
@@ -129,7 +144,7 @@ public class GameScreen extends ScreenAdapter {
 //        box2DDebugRenderer.render(world, camera.combined.cpy().scl(PPM));
 
         player.draw(batch);
-        player.drawHitbox();
+//        player.drawHitbox();
         batch.end();
         for (RayHandler rayHandler : rayHandlers){
             rayHandler.render();
