@@ -11,7 +11,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.mygdx.game.GameScreen;
+import com.mygdx.game.screen.GameScreen;
 import com.mygdx.game.entity.Ghoul;
 import com.mygdx.game.entity.SwordMan;
 import com.mygdx.game.object.AnimatedObject;
@@ -23,6 +23,7 @@ import static com.mygdx.game.utilz.Constant.PPM;
 
 public class TileMapHandler {
     private TiledMap tiledMap;
+    private TiledMap menuBack;
     private GameScreen gameScreen;
     private Random random = new Random();
 
@@ -34,6 +35,14 @@ public class TileMapHandler {
         tiledMap = new TmxMapLoader().load("map/map1.tmx");
         parseMapObject(tiledMap.getLayers().get("Object Layer 1").getObjects());
         return new OrthogonalTiledMapRenderer(tiledMap);
+    }
+    public OrthogonalTiledMapRenderer setUpMenu(){
+        menuBack = new TmxMapLoader().load("map/menuback.tmx");
+        parseMapObject(menuBack.getLayers().get("Object Layer 1").getObjects());
+        return new OrthogonalTiledMapRenderer(menuBack);
+    }
+    public static void createMenuBack(){
+
     }
     private Body createBody(Rectangle rectangle, boolean isStatic){
         return BodyHandler.createBody(
@@ -160,5 +169,7 @@ public class TileMapHandler {
         polygonShape.set(worldVertices);
         return polygonShape;
     }
-
+    public TiledMap getTiledMap(){
+        return tiledMap;
+    }
 }

@@ -1,27 +1,25 @@
 package com.mygdx.game.entity;
 
-import box2dLight.RayHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.MapProperties;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.World;
-import com.mygdx.game.GameScreen;
-import com.mygdx.game.utilz.LightHandler;
+import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Timer;
+import com.mygdx.game.screen.GameScreen;
 
-import java.lang.reflect.Type;
-
-import static com.mygdx.game.utilz.Constant.PPM;
-import static com.mygdx.game.utilz.Constant.TILE_SIZE;
+import static com.mygdx.game.utilz.Constant.*;
+import static java.lang.Math.abs;
 
 public class Entity extends Sprite {
+    private GameScreen gameScreen;
     public static Entity INSTANCE;
     protected float x, y, velX, velY, speed;
     protected float width, height;
@@ -44,7 +42,8 @@ public class Entity extends Sprite {
     protected boolean isAttacked = false;
     protected Rectangle hitBox, attackBox;
     protected int damage;
-    ShapeRenderer renderer = new ShapeRenderer();
+    protected int numberOfAction;
+
     public Entity(int type, String playerPicture, float width, float height,
                   float defaultWidth, float defaultHeight, Body body, int numberAction,
                   int idleAction, int numberIdleFrame,
@@ -55,20 +54,24 @@ public class Entity extends Sprite {
                   int hit, int numberHitFrame,
                   int die, int numberDieFrame) {
         super(new Texture(Gdx.files.internal(playerPicture)));
-        renderer.setAutoShapeType(true);
+
+        falling = PLAYER.SWORD_HERO.FALL;
+
         this.type = type;
         this.width = width;
         this.height = height;
         this.setSize(width, height);
-        hitBox = new Rectangle(body.getPosition().x, body.getPosition().y, width, height);
-        attackBox = new Rectangle(body.getPosition().x, body.getPosition().y, width * 1.5f, height);
+        hitBox = new Rectangle(body.getPosition().x, body.getPosition().y, width / 5f, height / 2f);
+        attackBox = new Rectangle(body.getPosition().x, body.getPosition().y, width / 2f, height / 2f);
         this.body = body;
         if (type == ENEMY) this.speed = 1f;
         else this.speed = 4f;
         INSTANCE = this;
         isActive = true;
 
-        animationLength = new int[numberAction];
+        animationLength = new int[numberAction + 1];
+        if (type == HERO) animationLength[falling] = PLAYER.SWORD_HERO.getType(PLAYER.SWORD_HERO.FALL);
+
         setIdle(idleAction, numberIdleFrame);
         setMovingAction(movingAction, numberMovingFrame);
         setAttackingAction(attackingAction, numberAttackingFrame);
@@ -87,42 +90,44 @@ public class Entity extends Sprite {
             animations[i] = new Animation<>(0.15f, animationFrames);
         }
     }
-    public void drawHitbox(){
-        renderer.begin();
-        renderer.rect(hitBox.getX(), hitBox.getY(), hitBox.getWidth(), hitBox.getHeight());
-        renderer.end();
-    }
+
     public void update(GameScreen gameScreen) {
         if (!isActive) return;
         this.setOriginCenter();
-        if (type == HERO) checkUserInput(gameScreen);
-        else enemyAction(gameScreen);
-        if (animations[currentAction].isAnimationFinished(stateTime)) {
+        if (animations[currentAction].isAnimationFinished(stateTime) && isOnGround(gameScreen.getWorld())) {
             stateTime = 0;
             currentAction = idle;
             isAttacked = false;
         }
+        if (type == HERO) {
+            checkUserInput(gameScreen);
+            if ((body.getLinearVelocity().y) <= -0.02) currentAction = falling;
+        }
+        else enemyAction(gameScreen);
+//        System.out.println(currentAction);
         stateTime += Gdx.graphics.getDeltaTime();
         x = body.getPosition().x * PPM;
         y = body.getPosition().y * PPM;
-        this.setPosition(x - this.getWidth() / 2, y - this.getHeight() / 2);
-        hitBox.setPosition(x - this.getWidth() / 2, y - this.getHeight() / 2);
-        attackBox.setPosition(x - this.getWidth() / 2, y - this.getHeight() / 2);
+        this.setPosition((x - this.getWidth() / 2), (y - this.getHeight() / 2));
+        hitBox.setPosition(x - hitBox.width / 2, y - hitBox.height / 2);
+        attackBox.setPosition(x - attackBox.width / 2, y - attackBox.height / 2);
 
-        if (type == HERO){
-            if (facingRight) this.setX(x - this.width / 2.5f);
-            else this.setX(x - this.width / 1.5f);
+        if (facingRight) {
+            this.setX(x - this.width / 2.5f);
+            attackBox.setX(attackBox.getX() + attackBox.width / 2.5f);
+        } else {
+            this.setX(x - this.width / 1.5f);
+            attackBox.setX(attackBox.getX() - attackBox.width / 2.5f);
         }
+
         if (currentAction != 6) {
             TextureRegion currentFrame = animations[currentAction].getKeyFrame(stateTime);
             this.setRegion(currentFrame);
         }
 
         if (!facingRight && !this.isFlipX()) {
-            // If it is, flip the sprite horizontally
             this.flip(true, false);
         } else if (facingRight && this.isFlipX()) {
-            // If the velocity in the x direction is greater than 0 and the sprite is flipped, unflip it
             this.flip(true, false);
         }
     }
@@ -130,14 +135,25 @@ public class Entity extends Sprite {
     public void enemyAction(GameScreen gameScreen) {
         Vector2 playerPos = gameScreen.getPlayer().getBody().getPosition();
         Vector2 enemyPos = body.getPosition();
-        if (Math.abs(playerPos.y - enemyPos.y) >= TILE_SIZE * 2) return;
+        if (abs(playerPos.y - enemyPos.y) >= TILE_SIZE * 2) return;
         float distanceToPlayer = body.getPosition().dst(playerPos);
         if (distanceToPlayer > attackRange) {
             currentAction = moving;
             float direction = (enemyPos.x < playerPos.x) ? 1 : -1;
             facingRight = direction == 1;
             body.setLinearVelocity(direction * speed, body.getLinearVelocity().y);
-        } else currentAction = attacking;
+        } else if (currentAction == idle) {
+            currentAction = attacking;
+            if (!isAttacked) hurtPlayer(gameScreen);
+        }
+    }
+
+    private void hurtPlayer(GameScreen gameScreen) {
+        isAttacked = true;
+        if (attackBox.overlaps(gameScreen.getPlayer().getHitBox())){
+            gameScreen.getPlayer().updateHealth(-damage);
+            gameScreen.getPlayer().currentAction = gameScreen.getPlayer().hit;
+        }
     }
 
     private void checkUserInput(GameScreen gameScreen) {
@@ -164,30 +180,67 @@ public class Entity extends Sprite {
             currentAction = attacking;
             if (!isAttacked) playerAttack(gameScreen);
         }
-        if (Math.abs(body.getLinearVelocity().y) < 0.01) {
+        if (Gdx.input.isKeyPressed(Input.Keys.S) && Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            if (isTileAtY(body.getPosition().y - 5 * TILE_SIZE, gameScreen)) return;
+            makePlayerSensor();
+            Timer.schedule(new Timer.Task() {
+                @Override
+                public void run() {
+                    makePlayerSolid();
+                }
+            }, 0.5f);
+        }
+        if (abs(body.getLinearVelocity().y) < 0.01) {
             jumpCount = 0;
 //            currentAction = idle;
         }
         body.setLinearVelocity(velX * speed, Math.min(body.getLinearVelocity().y, 25));
     }
 
+    private boolean isTileAtY(float y, GameScreen gameScreen) {
+        // Convert the player's position from world coordinates to tile coordinates
+        int tileX = (int) (body.getPosition().x / TILE_SIZE);
+        int tileY = (int) (y / TILE_SIZE);
+
+        // Get the tile layer
+        TiledMapTileLayer layer = (TiledMapTileLayer) gameScreen.getTileMapHandler().getTiledMap().getLayers().get("tiles");
+
+        // Get the tile at the player's position
+        TiledMapTileLayer.Cell cell = layer.getCell(tileX, tileY);
+
+        // Check if there is a tile at the player's position
+        return cell != null && cell.getTile() != null;
+    }
+
+    private void makePlayerSensor() {
+        // Create a sensor fixture if it doesn't exist yet
+        for (Fixture fixture : body.getFixtureList()) {
+            fixture.setSensor(true);
+        }
+    }
+
+    private void makePlayerSolid() {
+        for (Fixture fixture : body.getFixtureList()) {
+            fixture.setSensor(false);
+        }
+    }
+    
     private void playerAttack(GameScreen gameScreen) {
         isAttacked = true;
-        for (Entity entity : gameScreen.getEnemies()){
-            if (attackBox.overlaps(entity.hitBox)){
+        for (Entity entity : gameScreen.getEnemies()) {
+            if (attackBox.overlaps(entity.hitBox)) {
                 entity.updateHealth(-damage);
-                entity.currentAction = hit;
-                System.out.println("hit");
+                entity.currentAction = entity.hit;
             }
         }
     }
-    private void updateHealth(int damage){
+
+    private void updateHealth(int damage) {
         currentHealth += damage;
         System.out.println(currentHealth);
-        if (currentHealth <= 0){
+        if (currentHealth <= 0) {
             currentHealth = 0;
             currentAction = dead;
-            System.out.println("dead");
         }
     }
 
@@ -221,7 +274,8 @@ public class Entity extends Sprite {
         animationLength[idle] = numberFrame;
 //        System.out.println(idle + " " + animationLength[idle]);
     }
-    public void setDead(int dead, int numberFrame){
+
+    public void setDead(int dead, int numberFrame) {
         this.dead = dead;
         animationLength[dead] = numberFrame;
     }
@@ -229,7 +283,51 @@ public class Entity extends Sprite {
     public Body getBody() {
         return body;
     }
-    public void setDamage(int damage){
+
+    public void setDamage(int damage) {
         this.damage = damage;
+    }
+
+    public Rectangle getHitBox() {
+        return hitBox;
+    }
+
+    public Rectangle getAttackBox() {
+        return attackBox;
+    }
+
+    public void setGameScreen(GameScreen gameScreen) {
+        this.gameScreen = gameScreen;
+    }
+
+    public void setFalling(int falling, int numberFrames) {
+        this.falling = falling;
+        animationLength[falling] = numberFrames;
+        numberOfAction++;
+    }
+
+    public void setDead(int dead) {
+        this.dead = dead;
+    }
+    private boolean isOnGround(World world) {
+        final boolean[] isOnGround = new boolean[1];
+
+        // Define the start and end points of the ray. Start at the player's feet and end a little bit below.
+        Vector2 rayStart = body.getPosition();
+        Vector2 rayEnd = new Vector2(body.getPosition().x, body.getPosition().y - 0.1f);
+
+        // Define the callback function
+        RayCastCallback callback = new RayCastCallback() {
+            @Override
+            public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
+                isOnGround[0] = true;
+                return fraction;
+            }
+        };
+
+        // Perform the ray cast
+        world.rayCast(callback, rayStart, rayEnd);
+
+        return isOnGround[0];
     }
 }

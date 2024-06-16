@@ -5,8 +5,6 @@ import com.badlogic.gdx.Gdx;
 public class Constant {
     public static final float MODE = 2.3f;
     public static final float PPM = 32f;
-    public static final int GAME_WIDTH = 120 * 40;
-    public static final int GAME_HEIGHT = 100 * 40;
     public static final float TILE_SIZE = 16 / PPM;
     public static final int SCREEN_WIDTH = Gdx.graphics.getWidth();
     public static final int SCREEN_HEIGHT = Gdx.graphics.getHeight();

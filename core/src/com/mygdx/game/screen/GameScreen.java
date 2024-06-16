@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.screen;
 
 import box2dLight.Light;
 import box2dLight.PointLight;
@@ -11,6 +11,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -43,21 +45,24 @@ public class GameScreen extends ScreenAdapter {
     float time = 0;
     private List<PointLight> pointLights = new ArrayList<>();
     private Vector2 previousPlayerPosition = new Vector2();
+    ShapeRenderer renderer;
 
 
-    public GameScreen(OrthographicCamera camera) {
+    public GameScreen(OrthographicCamera camera, SpriteBatch batch) {
         System.out.println("Screen is created");
         this.camera = camera;
+        renderer = new ShapeRenderer();
+        renderer.setAutoShapeType(true);
         backgroundCamera = new OrthographicCamera();
         backgroundCamera.setToOrtho(false, SCREEN_WIDTH, SCREEN_HEIGHT);
         backgroundCamera.update();
-        this.batch = new SpriteBatch();
+        this.batch = batch;
         this.world = new World(new Vector2(0, -25f), false);
         this.tileMapHandler = new TileMapHandler(this);
         this.orthogonalTiledMapRenderer = tileMapHandler.setupMap();
         this.box2DDebugRenderer = new Box2DDebugRenderer();
         background = new Sprite(new Texture("background/background5.png"));
-
+        player.setGameScreen(this);
     }
 
     private void update() {
@@ -72,12 +77,12 @@ public class GameScreen extends ScreenAdapter {
         previousPlayerPosition.set(playerPosition);
         player.setScale(0.5f);
         for (Entity entity : enemies) entity.setScale(0.5f);
-        camera.zoom = (0.5f);
+        camera.zoom = (0.7f);
         time += Gdx.graphics.getDeltaTime();
 
         // Calculate the light intensity
-        float minIntensity = 0.7f;
-        float maxIntensity = 1.3f;
+        float minIntensity = 0.3f;
+        float maxIntensity = 1f;
         float intensity = (float)((Math.sin(time) + 1) / 2 * (maxIntensity - minIntensity) + minIntensity);
 
         // Set the light intensity
@@ -127,18 +132,30 @@ public class GameScreen extends ScreenAdapter {
             object.draw(batch);
         }
 //        box2DDebugRenderer.render(world, camera.combined.cpy().scl(PPM));
-
+//
         player.draw(batch);
-        player.drawHitbox();
+
         batch.end();
         for (RayHandler rayHandler : rayHandlers){
             rayHandler.render();
         }
+
+//        renderer.begin(ShapeRenderer.ShapeType.Line);
+//        renderer.setColor(Color.RED);
+//        for (Entity entity : enemies){
+//            renderer.rect(entity.getHitBox().getX(), entity.getHitBox().getY(), entity.getHitBox().getWidth(), entity.getHitBox().getHeight());
+//            renderer.rect(entity.getAttackBox().getX(), entity.getAttackBox().getY(), entity.getAttackBox().getWidth(), entity.getAttackBox().getHeight());
+//        }
+//        renderer.setProjectionMatrix(camera.combined);
+//        renderer.rect(player.getAttackBox().getX(), player.getAttackBox().getY(), player.getAttackBox().width, player.getAttackBox().getHeight());
+//        renderer.rect(player.getHitBox().getX(), player.getHitBox().getY(), player.getHitBox().getWidth(), player.getHitBox().getHeight());
+//        renderer.end();
     }
 
     @Override
     public void dispose() {
         for (RayHandler rayHandler : rayHandlers) rayHandler.dispose();
+        renderer.dispose();
     }
 
     public World getWorld() {
@@ -148,13 +165,13 @@ public class GameScreen extends ScreenAdapter {
         RayHandler rayHandler = new RayHandler(world);
         rayHandler.setAmbientLight(1f);
         if (!isStrong) {
-            PointLight pointLight = new PointLight(rayHandler, 200, Color.WHITE, 6, body.getPosition().x + 3, body.getPosition().y);
+            PointLight pointLight = new PointLight(rayHandler, 200, Color.WHITE, 5, body.getPosition().x + 3, body.getPosition().y);
             pointLight.setSoftnessLength(3f);
             pointLight.attachToBody(body, 0, 0);
             pointLight.setColor(new Color(1, 1, 1, 0.8f));
         }
         else{
-            PointLight pointLight = new PointLight(rayHandler, 200, Color.WHITE, 2, body.getPosition().x + 3, body.getPosition().y);
+            PointLight pointLight = new PointLight(rayHandler, 200, Color.WHITE, 1, body.getPosition().x + 3, body.getPosition().y);
             addPointLight(pointLight);
             pointLight.setSoftnessLength(0f);
             pointLight.attachToBody(body, 0, 0);
@@ -184,4 +201,9 @@ public class GameScreen extends ScreenAdapter {
     public void addPointLight(PointLight pointLight){
         pointLights.add(pointLight);
     }
+
+    public TileMapHandler getTileMapHandler() {
+        return tileMapHandler;
+    }
+
 }
