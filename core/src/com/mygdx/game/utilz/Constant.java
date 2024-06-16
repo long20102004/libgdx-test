@@ -392,7 +392,7 @@ public class Constant {
     public static class SWORD_MASTER {
         public static final int DEFAULT_WIDTH = 95;
         public static final int DEFAULT_HEIGHT = 49;
-        public static final int WIDTH = (int) (95 * MODE);
+        public static final int WIDTH = (int) (95 * 1.5f);
         public static final int HEIGHT = (int) (49 * MODE);
         public static final int IDLE = 0;
         public static final int MOVING = 1;
@@ -679,7 +679,7 @@ public class Constant {
     public static class SPITTER {
         public static final int DEFAULT_WIDTH = 57;
         public static final int DEFAULT_HEIGHT = 39;
-        public static final int WIDTH = (int) (DEFAULT_WIDTH * MODE);
+        public static final int WIDTH = (int) (DEFAULT_WIDTH * 1.6f);
         public static final int HEIGHT = (int) (DEFAULT_HEIGHT * MODE);
         public static final int WAKE = 0;
         public static final int MOVING = 1;
@@ -707,7 +707,7 @@ public class Constant {
     public static class SHIELDER {
         public static final int DEFAULT_WIDTH = 129;
         public static final int DEFAULT_HEIGHT = 46;
-        public static final int WIDTH = (int) (DEFAULT_WIDTH * MODE);
+        public static final int WIDTH = (int) (DEFAULT_WIDTH * 1.5f);
         public static final int HEIGHT = (int) (DEFAULT_HEIGHT * MODE);
         public static final int IDLE = 0;
         public static final int WALK = 1;
@@ -804,11 +804,63 @@ public class Constant {
         public static final int WIDTH = (int) (DEFAULT_WIDTH * 1.5f);
         public static final int HEIGHT = (int) (DEFAULT_HEIGHT * 1.6f);
     }
+    public static class DARK_WARDEN {
+        public static final int DEFAULT_WIDTH = 110;
+        public static final int DEFAULT_HEIGHT = 42;
+        public static final int WIDTH = (int) (DEFAULT_WIDTH * 2f);
+        public static final int HEIGHT = (int) (DEFAULT_HEIGHT * MODE);
+        public static final int IDLE = 0;
+        public static final int MOVING = 1;
+        public static final int ATTACK = 2;
+        public static final int HIT = 3;
+        public static final int DEAD = 4;
+
+        public static int getType(int type) {
+            switch (type) {
+                case IDLE:
+                    return 24;
+                case MOVING:
+                    return 12;
+                case ATTACK:
+                    return 16;
+                case HIT:
+                    return 2;
+                case DEAD:
+                    return 12;
+            }
+            return 1;
+        }
+    }
+
+    public static class CAGE_SHOCKER {
+        public static final int DEFAULT_WIDTH = 97;
+        public static final int DEFAULT_HEIGHT = 32;
+        public static final int WIDTH = (int) (DEFAULT_WIDTH * 1.5f);
+        public static final int HEIGHT = (int) (DEFAULT_HEIGHT * MODE);
+        public static final int IDLE = 0;
+        public static final int MOVING = 1;
+        public static final int ATTACK = 2;
+        public static final int DEAD = 3;
+
+        public static int getType(int type) {
+            switch (type) {
+                case IDLE:
+                    return 12;
+                case MOVING:
+                    return 12;
+                case ATTACK:
+                    return 15;
+                case DEAD:
+                    return 11;
+            }
+            return 1;
+        }
+    }
 
     public static class HOARDER {
         public static final int DEFAULT_WIDTH = 222;
         public static final int DEFAULT_HEIGHT = 119;
-        public static final int WIDTH = (int) (DEFAULT_WIDTH * MODE);
+        public static final int WIDTH = (int) (DEFAULT_WIDTH * 1.7f);
         public static final int HEIGHT = (int) (DEFAULT_HEIGHT * MODE);
         public static final int IDLE_LOW = 0;
         public static final int STATIONARY_ATTACK = 1;

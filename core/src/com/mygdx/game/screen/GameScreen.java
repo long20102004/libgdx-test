@@ -21,6 +21,8 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.game.entity.Entity;
 import com.mygdx.game.object.AnimatedObject;
+import com.mygdx.game.utilz.BodyHandler;
+import com.mygdx.game.utilz.MyInputProcessor;
 import com.mygdx.game.utilz.TileMapHandler;
 
 import java.awt.*;
@@ -46,7 +48,10 @@ public class GameScreen extends ScreenAdapter {
     private List<PointLight> pointLights = new ArrayList<>();
     private Vector2 previousPlayerPosition = new Vector2();
     ShapeRenderer renderer;
-
+    public static final short CATEGORY_PLAYER = 0x0001;
+    public static final short CATEGORY_MONSTER = 0x0002;
+    public static final short CATEGORY_ENVIRONMENT = 0x0003;
+    public static final short CATEGORY_OBJECTS = 0x0004;
 
     public GameScreen(OrthographicCamera camera, SpriteBatch batch) {
         System.out.println("Screen is created");
@@ -63,6 +68,12 @@ public class GameScreen extends ScreenAdapter {
         this.box2DDebugRenderer = new Box2DDebugRenderer();
         background = new Sprite(new Texture("background/background5.png"));
         player.setGameScreen(this);
+        BodyHandler.setCollisionFilter(player.getBody(), CATEGORY_PLAYER, (short) ~CATEGORY_MONSTER);
+        for (Entity enemy : enemies) {
+            BodyHandler.setCollisionFilter(enemy.getBody(), CATEGORY_MONSTER, (short) ~CATEGORY_MONSTER);
+
+        }
+        Gdx.input.setInputProcessor(new MyInputProcessor());
     }
 
     private void update() {
@@ -77,7 +88,7 @@ public class GameScreen extends ScreenAdapter {
         previousPlayerPosition.set(playerPosition);
         player.setScale(0.5f);
         for (Entity entity : enemies) entity.setScale(0.5f);
-        camera.zoom = (0.7f);
+        camera.zoom = (0.75f);
         time += Gdx.graphics.getDeltaTime();
 
         // Calculate the light intensity
@@ -100,7 +111,10 @@ public class GameScreen extends ScreenAdapter {
         orthogonalTiledMapRenderer.setView(camera);
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) Gdx.app.exit();
         player.update(this);
-        for (Entity enemy : enemies) enemy.update(this);
+        for (Entity enemy : enemies) {
+            enemy.update(this);
+//            BodyHandler.setCollisionFilter(enemy.getBody(), CATEGORY_MONSTER, (short) ~CATEGORY_PLAYER);
+        }
         for (AnimatedObject object : objects) object.update();
     }
 
@@ -115,12 +129,12 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         this.update();
-        Gdx.gl.glClearColor(30f / 255, 30f / 255, 30f / 255, 1);
+        Gdx.gl.glClearColor(25f / 255, 25 / 255f, 25f / 255, 1);
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
         orthogonalTiledMapRenderer.setView(camera);
         batch.setProjectionMatrix(backgroundCamera.combined);
         batch.begin();
-//        batch.draw(background, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        batch.draw(background, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         batch.end();
         orthogonalTiledMapRenderer.render();
 
@@ -139,17 +153,17 @@ public class GameScreen extends ScreenAdapter {
         for (RayHandler rayHandler : rayHandlers){
             rayHandler.render();
         }
+        renderer.setProjectionMatrix(camera.combined);
 
-//        renderer.begin(ShapeRenderer.ShapeType.Line);
-//        renderer.setColor(Color.RED);
-//        for (Entity entity : enemies){
-//            renderer.rect(entity.getHitBox().getX(), entity.getHitBox().getY(), entity.getHitBox().getWidth(), entity.getHitBox().getHeight());
-//            renderer.rect(entity.getAttackBox().getX(), entity.getAttackBox().getY(), entity.getAttackBox().getWidth(), entity.getAttackBox().getHeight());
-//        }
-//        renderer.setProjectionMatrix(camera.combined);
-//        renderer.rect(player.getAttackBox().getX(), player.getAttackBox().getY(), player.getAttackBox().width, player.getAttackBox().getHeight());
-//        renderer.rect(player.getHitBox().getX(), player.getHitBox().getY(), player.getHitBox().getWidth(), player.getHitBox().getHeight());
-//        renderer.end();
+        renderer.begin(ShapeRenderer.ShapeType.Line);
+        renderer.setColor(Color.RED);
+        for (Entity entity : enemies){
+            renderer.rect(entity.getHitBox().getX(), entity.getHitBox().getY(), entity.getHitBox().getWidth(), entity.getHitBox().getHeight());
+            renderer.rect(entity.getAttackBox().getX(), entity.getAttackBox().getY(), entity.getAttackBox().getWidth(), entity.getAttackBox().getHeight());
+        }
+        renderer.rect(player.getAttackBox().getX(), player.getAttackBox().getY(), player.getAttackBox().width, player.getAttackBox().getHeight());
+        renderer.rect(player.getHitBox().getX(), player.getHitBox().getY(), player.getHitBox().getWidth(), player.getHitBox().getHeight());
+        renderer.end();
     }
 
     @Override

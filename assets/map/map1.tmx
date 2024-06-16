@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="100" height="60" tilewidth="16" tileheight="16" infinite="0" nextlayerid="15" nextobjectid="26">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="100" height="60" tilewidth="16" tileheight="16" infinite="0" nextlayerid="15" nextobjectid="42">
  <editorsettings>
   <export target="../../../../../Documents/GDev/Dark Tileset Test..json" format="json"/>
  </editorsettings>
@@ -89,15 +89,6 @@
  </layer>
  <objectgroup id="14" name="Object Layer 1">
   <object id="2" name="player" x="476.677" y="414.422" width="15" height="30"/>
-  <object id="5" x="313.499" y="682.553">
-   <polyline points="0,0 417.977,4.45446"/>
-  </object>
-  <object id="6" x="510.5" y="449.5">
-   <polyline points="0,0 1,141.5 -156,140 -167.5,115.5 -153,89.5 -92.5,92 -82.5,86 -78,42.5 -117,18 -146,34 -172,28.5 -172.5,-0.5 -206,-3 -205.5,229"/>
-  </object>
-  <object id="7" x="390.5" y="441">
-   <polyline points="0,0 -8.5,-8 -8,-16 -3.5,-50 23,-61.5 34,-56.5 66.5,-60 76.5,-57 113,-60 128,-57.5 195.5,-58.5 208,-85.5 228.5,-95.5 237,-87.5 236,-79.5 235.5,-69 245.5,-68.5 250,-61 251.5,-49 250.5,-6.5 242.5,3.5 202.5,7.5 205,33.5 306.5,40 335,41 341,47.5 345.5,52.5 348.5,64.5 341,100 332.5,107 201.5,101.5 203.5,145.5 204.5,151.5 219,148 219.5,161 217.5,164 222.5,181 240,181 333.5,183.5 342.5,189 346,205 344.5,243"/>
-  </object>
   <object id="8" x="530" y="593.333">
    <polygon points="0,0 44.6667,-0.333333 46,1.33333 45.6667,30.3333 -1.33333,30.6667 -2,27.3333"/>
   </object>
@@ -108,13 +99,36 @@
   <object id="13" name="light" x="708.333" y="487.333"/>
   <object id="14" x="587" y="535.5"/>
   <object id="18" x="349" y="657.5" width="1.25" height="0.5"/>
-  <object id="23" x="392" y="444">
-   <polyline points="0,0 4,3 216.75,3"/>
+  <object id="25" name="ghoul" x="415.5" y="417" width="15" height="27"/>
+  <object id="28" name="sword-master" x="664.333" y="653.333" width="20" height="30"/>
+  <object id="29" name="spitter" x="474.667" y="649.333" width="20" height="30"/>
+  <object id="30" x="311.333" y="688.667">
+   <polyline points="0,0 485.333,0 496,12 518,15.3333 822,15.3333 825.333,-8.66667 824.667,-109.333 761.333,-180.667 560.667,-180 490.667,-115.333 487.333,-38 426.667,-39.3333 408,-67.3333 300.667,-66 298,-97.3333 285.333,-101.333 279.333,-144.545"/>
   </object>
-  <object id="24" x="512.75" y="448.75">
-   <polyline points="0,0 -1.5,70.5 -1.25,112"/>
+  <object id="31" x="529.667" y="592">
+   <polyline points="-0.666667,1 47.3333,0.666667 44.6667,33.3333 3,33.3333"/>
   </object>
-  <object id="25" name="ghould" x="415.5" y="417" width="15" height="27"/>
+  <object id="32" x="339" y="476">
+   <polyline points="172.667,-25.3333 171.333,111.333 14,114 8.66667,84.6667 25.3333,64.6667 78,69.3333 93.3333,66.6667 95.3333,14 56.6667,-6 28.6667,8.66667 0,0 0,-28.6667 -34.6667,-28.6667 -31.3333,212 461.333,214.667"/>
+  </object>
+  <object id="34" x="628.667" y="361.333">
+   <polyline points="0,0 -9.33333,-13.3333 -20.6667,-12.6667 -32.6667,2 -35.3333,19.3333 -218,20 -243.333,30 -246.667,66 -234,84.6667 6,86"/>
+  </object>
+  <object id="37" x="631" y="446">
+   <polyline points="0,0 11,-27 13,-64 -8,-99 -21,-98"/>
+  </object>
+  <object id="38" x="822" y="396">
+   <polyline points="0,0 330,4 330,49 508,53 520,42 524,-27 512,-34 510,-54 498,-60 490,-74 -4,-78 -27,-52 -19,-9"/>
+  </object>
+  <object id="39" x="865" y="625">
+   <polyline points="0,0 -0.5,44.5 45.5,45.5"/>
+  </object>
+  <object id="40" x="864" y="623.5">
+   <polygon points="0,0 49,0 49,47.5 0.5,49"/>
+  </object>
+  <object id="41" x="1022.5" y="623">
+   <polygon points="0,0 0.5,46.5 48.5,47 47.5,0.5"/>
+  </object>
  </objectgroup>
  <layer id="12" name="Cave in Wall" width="100" height="60">
   <data encoding="csv">
